@@ -16,7 +16,9 @@ HttpResponse::HttpResponse(int code, const std::string& message, const std::stri
         {".jpeg", "image/jpeg"},       {".gif", "image/gif"}, {".svg", "image/svg+xml"},
         {".txt", "text/plain"}};
 
-    std::string fileExtension = filePath.substr(filePath.find_last_of('.'));
+    std::string fileExtension = "";
+    if (!filePath.empty())
+        fileExtension = filePath.substr(filePath.find_last_of('.'));
     HttpHeaders headers;
     std::string correctExtension = contentTypeMap[fileExtension];
 

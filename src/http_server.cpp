@@ -9,8 +9,10 @@
 #include "http_server.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+
 namespace RobeHttpServer
 {
+
 HttpServer::HttpServer(int port) : port(port)
 {
 }
@@ -23,9 +25,20 @@ void HttpServer::handleRequest(int clientSocket)
     char clientBuffer[1024];
     read(clientSocket, clientBuffer, 1024);
     HttpRequest request(clientBuffer);
-    std::string body = readFile(request.getPath());
-    HttpResponse response(200, "OK", body, request.getPath());
-    std::string httpResponse = response.httpResponse();
+    std::string body = "";
+    if (request.getPath() != "")
+        body = readFile(request.getPath());
+    std::string httpResponse = "";
+    if (body.empty())
+    {
+        HttpResponse response(404, "Not Found ", body, request.getPath());
+        httpResponse = response.httpResponse();
+    }
+    else
+    {
+        HttpResponse response(200, "OK", body, request.getPath());
+        httpResponse = response.httpResponse();
+    }
     write(clientSocket, httpResponse.c_str(), httpResponse.size());
     close(clientSocket);
 }
@@ -45,6 +58,7 @@ std::string HttpServer::readFile(const std::string& path)
 
 void HttpServer::start()
 {
+    std::cout << "Started Server" << std::endl;
 
     int serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     socklen_t peerAddressSize;
@@ -54,18 +68,21 @@ void HttpServer::start()
     serverAddress.sin_port = htons(port);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     if (bind(serverSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)))
+    {
+        std::cout << "Failed to bind server to socket" << std::endl;
         return;
+    }
     listen(serverSocket, 5);
     struct sockaddr_in clientAddress;
     peerAddressSize = sizeof(struct sockaddr_in);
 
     while (true)
     {
+
         int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &peerAddressSize);
         std::thread requestThread(&HttpServer::handleRequest, this, clientSocket);
         requestThread.detach();
     }
-    // if we somehow reach this stop server :D
     stop();
 }
 void HttpServer::stop()

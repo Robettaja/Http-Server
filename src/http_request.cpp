@@ -1,10 +1,12 @@
 #include <sstream>
 #include <vector>
 #include <iostream>
+
 #include "http_request.hpp"
 
 namespace RobeHttpServer
 {
+
 HttpRequest::HttpRequest(const std::string& request)
 {
 
@@ -23,13 +25,12 @@ HttpRequest::HttpRequest(const std::string& request)
         if (line == "\r" || line == "\n" || line.empty())
             bodyIndex = i + 1;
     }
+
     std::string firstLine = lines[0];
-    std::cout << firstLine << std::endl;
     int slashIndex = firstLine.find("/") + 1;
-    std::cout << firstLine.find(" ", 5) << std::endl;
     path = firstLine.substr(slashIndex, firstLine.find(" ", 5) - slashIndex);
 
-    method = lines[0];
+    method = firstLine.substr(0, firstLine.find(" "));
     headers = HttpHeaders::fromRequest(request);
     for (int i = bodyIndex; i < lines.size(); ++i)
     {
