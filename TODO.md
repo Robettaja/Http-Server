@@ -1,6 +1,6 @@
 - [x] show html
 - [x] open correct file
 - include css and js files
-- reverse proxy
 - add security
+- reverse proxy
 - make it work with react

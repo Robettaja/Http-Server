@@ -23,7 +23,6 @@ void HttpServer::handleRequest(int clientSocket)
     char clientBuffer[1024];
     read(clientSocket, clientBuffer, 1024);
     HttpRequest request(clientBuffer);
-    std::cout << request.getPath() << std::endl;
     std::string body = readFile(request.getPath());
     HttpResponse response(200, "OK", body, request.getPath());
     std::string httpResponse = response.httpResponse();
@@ -65,8 +64,8 @@ void HttpServer::start()
         int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &peerAddressSize);
         std::thread requestThread(&HttpServer::handleRequest, this, clientSocket);
         requestThread.detach();
-        // handleRequest(clientSocket);
     }
+    // if we somehow reach this stop server :D
     stop();
 }
 void HttpServer::stop()
