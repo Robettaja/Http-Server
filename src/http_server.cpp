@@ -24,13 +24,13 @@ void HttpServer::handleRequest(int clientSocket)
     read(clientSocket, clientBuffer, 1024);
     HttpRequest request(clientBuffer);
     std::cout << request.getPath() << std::endl;
-    std::string site = parseHtml(request.getPath());
-    HttpResponse response(200, "OK", site, request.getPath());
+    std::string body = readFile(request.getPath());
+    HttpResponse response(200, "OK", body, request.getPath());
     std::string httpResponse = response.httpResponse();
     write(clientSocket, httpResponse.c_str(), httpResponse.size());
     close(clientSocket);
 }
-std::string HttpServer::parseHtml(const std::string& path)
+std::string HttpServer::readFile(const std::string& path)
 {
     std::ifstream file(path);
     if (!file)
@@ -63,7 +63,9 @@ void HttpServer::start()
     while (true)
     {
         int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &peerAddressSize);
-        handleRequest(clientSocket);
+        std::thread requestThread(&HttpServer::handleRequest, this, clientSocket);
+        requestThread.detach();
+        // handleRequest(clientSocket);
     }
     stop();
 }

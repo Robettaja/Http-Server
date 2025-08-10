@@ -17,7 +17,6 @@ HttpRequest::HttpRequest(const std::string& request)
     while (std::getline(ss, line))
     {
         lines.emplace_back(line);
-        // std::cout << line << std::endl;
     }
     for (int i = 0; i < lines.size(); ++i)
     {
