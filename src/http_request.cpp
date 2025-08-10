@@ -17,7 +17,7 @@ HttpRequest::HttpRequest(const std::string& request)
     while (std::getline(ss, line))
     {
         lines.emplace_back(line);
-        std::cout << line << std::endl;
+        // std::cout << line << std::endl;
     }
     for (int i = 0; i < lines.size(); ++i)
     {
@@ -25,7 +25,8 @@ HttpRequest::HttpRequest(const std::string& request)
         if (line == "\r" || line == "\n" || line.empty())
             bodyIndex = i + 1;
     }
-    path = lines[0].substr(lines[0].find("/") + 1, lines[0].find(".") + 1);
+    path = lines[0].substr(lines[0].find("/") + 1, lines[0].find("."));
+    path.erase(remove(path.begin(), path.end(), ' '), path.end());
     method = lines[0];
     headers = HttpHeaders::fromRequest(request);
     for (int i = bodyIndex; i < lines.size(); ++i)

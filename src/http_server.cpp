@@ -4,6 +4,7 @@
 #include <sstream>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <thread>
 
 #include "http_server.hpp"
 #include "http_request.hpp"
@@ -16,6 +17,18 @@ HttpServer::HttpServer(int port) : port(port)
 HttpServer::~HttpServer()
 {
     stop();
+}
+void HttpServer::handleRequest(int clientSocket)
+{
+    char clientBuffer[1024];
+    read(clientSocket, clientBuffer, 1024);
+    HttpRequest request(clientBuffer);
+    std::cout << request.getPath() << std::endl;
+    std::string site = parseHtml(request.getPath());
+    HttpResponse response(200, "OK", site, request.getPath());
+    std::string httpResponse = response.httpResponse();
+    write(clientSocket, httpResponse.c_str(), httpResponse.size());
+    close(clientSocket);
 }
 std::string HttpServer::parseHtml(const std::string& path)
 {
@@ -50,16 +63,7 @@ void HttpServer::start()
     while (true)
     {
         int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &peerAddressSize);
-        std::cout << "Client connected" << std::endl;
-        char clientBuffer[1024];
-        read(clientSocket, clientBuffer, 1024);
-        HttpRequest request(clientBuffer);
-        std::cout << request.getPath() << std::endl;
-
-        std::string site = parseHtml("index.html");
-        HttpResponse response(200, "OK", site);
-        std::string httpResponse = response.httpResponse();
-        write(clientSocket, httpResponse.c_str(), httpResponse.size());
+        handleRequest(clientSocket);
     }
     stop();
 }

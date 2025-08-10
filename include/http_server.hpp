@@ -15,6 +15,7 @@ class HttpServer
     int serverSocket;
 
     std::string parseHtml(const std::string& path);
+    void handleRequest(int clientSocket);
 
   public:
     HttpServer(int port = 8080);

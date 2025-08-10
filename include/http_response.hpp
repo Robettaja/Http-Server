@@ -13,7 +13,7 @@ class HttpResponse
     std::string body;
 
   public:
-    HttpResponse(int code, const std::string& message, const std::string& bodyContent);
+    HttpResponse(int code, const std::string& message, const std::string& bodyContent, const std::string& filePath);
     std::string httpResponse();
 };
 

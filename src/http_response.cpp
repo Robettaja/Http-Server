@@ -6,13 +6,23 @@
 namespace RobeHttpServer
 {
 
-HttpResponse::HttpResponse(int code, const std::string& message, const std::string& bodyContent)
+HttpResponse::HttpResponse(int code, const std::string& message, const std::string& bodyContent,
+                           const std::string& filePath)
     : statusCode(code), statusMessage(message), body(bodyContent)
 {
+    std::unordered_map<std::string, std::string> contentTypeMap = {
+        {".html", "text/html"},        {".css", "text/css"},  {".js", "application/javascript"},
+        {".json", "application/json"}, {".png", "image/png"}, {".jpg", "image/jpeg"},
+        {".jpeg", "image/jpeg"},       {".gif", "image/gif"}, {".svg", "image/svg+xml"},
+        {".txt", "text/plain"}};
+    std::string fileExtension = filePath.substr(filePath.find_last_of('.'));
     HttpHeaders headers;
+    std::string correctExtension = contentTypeMap[fileExtension];
+    std::cout << correctExtension << std::endl;
+
     headers.addHeader("Server", "RobeHttpServer");
     headers.addHeader("Content-Length", std::to_string(body.size()));
-    headers.addHeader("Content-Type", "text/html");
+    headers.addHeader("Content-Type", correctExtension);
     this->headers = headers;
 }
 
