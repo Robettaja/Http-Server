@@ -18,7 +18,14 @@ HttpResponse::HttpResponse(int code, const std::string& message, const std::stri
 
     std::string fileExtension = "";
     if (!filePath.empty())
-        fileExtension = filePath.substr(filePath.find_last_of('.'));
+        try
+        {
+            fileExtension = filePath.substr(filePath.find_last_of('.'));
+        }
+        catch (const std::exception& e)
+        {
+            std::cerr << "Error extracting file extension: " << e.what() << std::endl;
+        }
     HttpHeaders headers;
     std::string correctExtension = contentTypeMap[fileExtension];
 

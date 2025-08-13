@@ -29,6 +29,10 @@ HttpRequest::HttpRequest(const std::string& request)
     std::string firstLine = lines[0];
     int slashIndex = firstLine.find("/") + 1;
     path = firstLine.substr(slashIndex, firstLine.find(" ", 5) - slashIndex);
+    if (path.empty())
+    {
+        path = "index.html";
+    }
 
     method = firstLine.substr(0, firstLine.find(" "));
     headers = HttpHeaders::fromRequest(request);

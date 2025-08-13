@@ -23,8 +23,12 @@ HttpServer::~HttpServer()
     stop();
 }
 void HttpServer::handleRequest(int clientSocket)
-{
 
+{
+    struct sockaddr_in* pV4Addr = (struct sockaddr_in*)&clientSocket;
+    struct in_addr ipAddr = pV4Addr->sin_addr;
+    char str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &ipAddr, str, sizeof(str));
     SSL* ssl = SSL_new(ctx);
     SSL_set_fd(ssl, clientSocket);
     if (SSL_accept(ssl) <= 0)
@@ -96,7 +100,6 @@ void HttpServer::start()
         ERR_print_errors_fp(stderr);
     }
 
-    // Load certificate and private key
     if (SSL_CTX_use_certificate_file(ctx, "keys/localhost+2.pem", SSL_FILETYPE_PEM) <= 0)
     {
         ERR_print_errors_fp(stderr);

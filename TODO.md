@@ -3,6 +3,10 @@
 - [x] include css and js files
 - [x] make it work with https
 - add security
+  - check if http request valid
+  - maybe rate limit
+  - don't send specific file types
+
 - reverse proxy
 - make it work with react
 - before quiting dockerize server
