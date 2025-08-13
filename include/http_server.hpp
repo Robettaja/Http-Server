@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <sys/epoll.h>
 #include <sys/types.h>
+#include <openssl/ssl.h>
 
 namespace RobeHttpServer
 {
@@ -13,6 +14,7 @@ class HttpServer
   private:
     int port;
     int serverSocket;
+    SSL_CTX* ctx;
 
     std::string readFile(const std::string& path);
     void handleRequest(int clientSocket);

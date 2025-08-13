@@ -1,6 +1,8 @@
 - [x] show html
 - [x] open correct file
-- include css and js files
+- [x] include css and js files
+- [x] make it work with https
 - add security
 - reverse proxy
 - make it work with react
+- before quiting dockerize server
