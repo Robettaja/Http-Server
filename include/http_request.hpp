@@ -13,6 +13,8 @@ class HttpRequest
     HttpHeaders headers;
     std::string body;
 
+    std::string sanitizePath(const std::string& path);
+
   public:
     HttpRequest(const std::string& request);
     std::string parseRequest(const std::string& request);

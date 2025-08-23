@@ -1,5 +1,7 @@
 #include <sstream>
+#include <string>
 #include <vector>
+#include <iostream>
 
 #include "http_request.hpp"
 
@@ -26,12 +28,14 @@ HttpRequest::HttpRequest(const std::string& request)
     }
 
     std::string firstLine = lines[0];
+    std::cout << firstLine << std::endl;
     int slashIndex = firstLine.find("/") + 1;
     path = firstLine.substr(slashIndex, firstLine.find(" ", 5) - slashIndex);
     if (path.empty())
     {
         path = "index.html";
     }
+    path = sanitizePath(path);
 
     method = firstLine.substr(0, firstLine.find(" "));
     headers = HttpHeaders::fromRequest(request);
@@ -41,6 +45,27 @@ HttpRequest::HttpRequest(const std::string& request)
         if (i != lines.size() - 1)
             body += "\n";
     }
+}
+std::string HttpRequest::sanitizePath(const std::string& path)
+{
+    std::vector<std::string> illegalCharacters = {
+        "..", "%2e", "%2E", "%2f", "%2F", "%252f", "//", "./", "\\\\", "%5c", "%5C", "%00",
+    };
+    std::string sanitized = path;
+    for (std::string illegalCharacter : illegalCharacters)
+    {
+        int removeIndex = sanitized.find(illegalCharacter);
+        while (removeIndex != std::string::npos)
+        {
+            if (removeIndex != std::string::npos)
+                sanitized.erase(removeIndex, illegalCharacter.length());
+            removeIndex = sanitized.find(illegalCharacter);
+        }
+    }
+    if (sanitized[0] == '/')
+        sanitized.erase(0, 1);
+    std::cout << "Sanitized path: " << sanitized << std::endl;
+    return sanitized;
 }
 
 } // namespace RobeHttpServer
