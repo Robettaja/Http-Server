@@ -20,6 +20,10 @@ class HttpRequest
     {
         return path;
     }
+    std::string getMethod() const
+    {
+        return method;
+    }
 };
 
 } // namespace RobeHttpServer

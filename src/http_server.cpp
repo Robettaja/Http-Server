@@ -22,26 +22,45 @@ HttpServer::~HttpServer()
 {
     stop();
 }
-void HttpServer::handleRequest(int clientSocket)
-
+void HttpServer::redirect(int clientSocket)
 {
-    struct sockaddr_in* pV4Addr = (struct sockaddr_in*)&clientSocket;
-    struct in_addr ipAddr = pV4Addr->sin_addr;
-    char str[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &ipAddr, str, sizeof(str));
+    char messageBuffer[1024];
+    read(clientSocket, messageBuffer, sizeof(messageBuffer));
+    HttpRequest request(messageBuffer);
+    std::string path = request.getPath();
+    HttpResponse response(303, "See Other", "", path);
+    std::string redirection = response.httpResponse();
+    write(clientSocket, redirection.c_str(), redirection.length());
+}
+void HttpServer::handleRequest(int clientSocket)
+{
+    char peekBuf[4];
+    int r = recv(clientSocket, peekBuf, sizeof(peekBuf), MSG_PEEK);
+    if (r)
+    {
+        // this redirects to https if using http
+        unsigned char c1 = peekBuf[0];
+        unsigned char c2 = peekBuf[1];
+        if (!(c1 == 0x16 && (c2 == 0x03)))
+        {
+            redirect(clientSocket);
+            close(clientSocket);
+            return;
+        }
+    }
     SSL* ssl = SSL_new(ctx);
     SSL_set_fd(ssl, clientSocket);
     if (SSL_accept(ssl) <= 0)
     {
-        ERR_print_errors_fp(stderr);
-        SSL_free(ssl);
-        close(clientSocket);
+        SSL_set_fd(ssl, -1);
+        cleanClient(clientSocket, ssl);
         return;
     }
 
     char clientBuffer[1024];
 
     int bytes = SSL_read(ssl, clientBuffer, sizeof(clientBuffer) - 1);
+
     if (bytes <= 0)
     {
         ERR_print_errors_fp(stderr);
@@ -50,8 +69,12 @@ void HttpServer::handleRequest(int clientSocket)
         close(clientSocket);
         return;
     }
-    // read(clientSocket, clientBuffer, 1024);
     HttpRequest request(clientBuffer);
+
+    if (request.getMethod() != "GET")
+    {
+        return;
+    }
     std::string body = "";
     if (request.getPath() != "")
         body = readFile(request.getPath());
@@ -66,8 +89,11 @@ void HttpServer::handleRequest(int clientSocket)
         HttpResponse response(200, "OK", body, request.getPath());
         httpResponse = response.httpResponse();
     }
-    // write(clientSocket, httpResponse.c_str(), httpResponse.size());
     SSL_write(ssl, httpResponse.c_str(), httpResponse.size());
+    cleanClient(clientSocket, ssl);
+}
+void HttpServer::cleanClient(int clientSocket, SSL* ssl)
+{
     SSL_shutdown(ssl);
     SSL_free(ssl);
     close(clientSocket);

@@ -26,14 +26,50 @@ HttpResponse::HttpResponse(int code, const std::string& message, const std::stri
         {
             std::cerr << "Error extracting file extension: " << e.what() << std::endl;
         }
+    ResponseType responseType = getResponseType(code);
     HttpHeaders headers;
     std::string correctExtension = contentTypeMap[fileExtension];
+    switch (responseType)
+    {
+    case ResponseType::information: {
+        break;
+    }
+    case ResponseType::successful: {
+        headers.addHeader("Server", "RobeHttpServer");
+        headers.addHeader("Content-Length", std::to_string(body.size()));
+        headers.addHeader("Content-Type", correctExtension);
+        break;
+    }
 
-    headers.addHeader("Server", "RobeHttpServer");
-    headers.addHeader("Content-Length", std::to_string(body.size()));
-    headers.addHeader("Content-Type", correctExtension);
+    case ResponseType::redirection: {
+        headers.addHeader("Location", "https://localhost:8443/" + filePath);
+        headers.addHeader("Content-Length", std::to_string(body.size()));
+        headers.addHeader("Content-Type", correctExtension);
+        break;
+    }
+    case ResponseType::clientError: {
+        headers.addHeader("Server", "RobeHttpServer");
+        headers.addHeader("Content-Length", std::to_string(body.size()));
+        headers.addHeader("Content-Type", correctExtension);
+
+        break;
+    }
+    case ResponseType::serverError: {
+
+        break;
+    }
+    }
 
     this->headers = headers;
+}
+ResponseType HttpResponse::getResponseType(int code)
+{
+    int enumNum = code;
+    while (enumNum >= 10)
+    {
+        enumNum /= 10;
+    }
+    return static_cast<ResponseType>(enumNum);
 }
 
 std::string HttpResponse::httpResponse()

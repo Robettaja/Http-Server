@@ -18,6 +18,8 @@ class HttpServer
 
     std::string readFile(const std::string& path);
     void handleRequest(int clientSocket);
+    void redirect(int clientSocket);
+    void cleanClient(int clientSocket, SSL* ssl);
 
   public:
     HttpServer(int port = 8080);
