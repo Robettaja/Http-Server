@@ -5,7 +5,7 @@
 - add security
   - check if http request valid
   - maybe rate limit
-  - don't send specific file types
+  - [x] don't send specific file types
 
 - reverse proxy
 - make it work with react

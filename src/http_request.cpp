@@ -28,7 +28,6 @@ HttpRequest::HttpRequest(const std::string& request)
     }
 
     std::string firstLine = lines[0];
-    std::cout << firstLine << std::endl;
     int slashIndex = firstLine.find("/") + 1;
     path = firstLine.substr(slashIndex, firstLine.find(" ", 5) - slashIndex);
     if (path.empty())
@@ -64,7 +63,6 @@ std::string HttpRequest::sanitizePath(const std::string& path)
     }
     if (sanitized[0] == '/')
         sanitized.erase(0, 1);
-    std::cout << "Sanitized path: " << sanitized << std::endl;
     return sanitized;
 }
 

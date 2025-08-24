@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "http_headers.hpp"
 
 namespace RobeHttpServer
@@ -16,6 +17,8 @@ enum ResponseType
 class HttpResponse
 {
   private:
+    // Can add more if nessessary
+    std::vector<std::string> allowedFileTypes = {".html", ".css", ".js", ".json", ".jpg", ".png", ".webp"};
     int statusCode;
     std::string statusMessage;
     HttpHeaders headers;
@@ -23,7 +26,7 @@ class HttpResponse
     ResponseType getResponseType(int code);
 
   public:
-    HttpResponse(int code, const std::string& message, const std::string& bodyContent, const std::string& filePath);
+    HttpResponse(int code, const std::string& bodyContent, const std::string& filePath);
     std::string httpResponse();
 };
 

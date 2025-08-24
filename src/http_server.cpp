@@ -1,9 +1,8 @@
 #include <fstream>
 #include <iostream>
-#include <netinet/in.h>
 #include <sstream>
 #include <sys/socket.h>
-#include <unistd.h>
+#include <chrono>
 #include <thread>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -28,12 +27,24 @@ void HttpServer::redirect(int clientSocket)
     read(clientSocket, messageBuffer, sizeof(messageBuffer));
     HttpRequest request(messageBuffer);
     std::string path = request.getPath();
-    HttpResponse response(303, "See Other", "", path);
+    HttpResponse response(303, "", path);
     std::string redirection = response.httpResponse();
     write(clientSocket, redirection.c_str(), redirection.length());
 }
 void HttpServer::handleRequest(int clientSocket)
 {
+    struct sockaddr_in addr;
+    socklen_t addrLen = sizeof(addr);
+    if (getpeername(clientSocket, (struct sockaddr*)&addr, &addrLen) == 0)
+    {
+        std::cout << std::string(inet_ntoa(addr.sin_addr)) << std::endl;
+    }
+    else
+    {
+        close(clientSocket);
+        return;
+    }
+
     char peekBuf[4];
     int r = recv(clientSocket, peekBuf, sizeof(peekBuf), MSG_PEEK);
     if (r)
@@ -81,12 +92,12 @@ void HttpServer::handleRequest(int clientSocket)
     std::string httpResponse = "";
     if (body.empty())
     {
-        HttpResponse response(404, "Not Found ", body, request.getPath());
+        HttpResponse response(404, body, request.getPath());
         httpResponse = response.httpResponse();
     }
     else
     {
-        HttpResponse response(200, "OK", body, request.getPath());
+        HttpResponse response(200, body, request.getPath());
         httpResponse = response.httpResponse();
     }
     SSL_write(ssl, httpResponse.c_str(), httpResponse.size());
@@ -164,8 +175,10 @@ void HttpServer::start()
     {
 
         int clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddress, &peerAddressSize);
+
         std::thread requestThread(&HttpServer::handleRequest, this, clientSocket);
         requestThread.detach();
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
     stop();
 }
