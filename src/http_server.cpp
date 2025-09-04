@@ -33,17 +33,17 @@ void HttpServer::redirect(int clientSocket)
 }
 void HttpServer::handleRequest(int clientSocket)
 {
-    struct sockaddr_in addr;
-    socklen_t addrLen = sizeof(addr);
-    if (getpeername(clientSocket, (struct sockaddr*)&addr, &addrLen) == 0)
-    {
-        std::cout << std::string(inet_ntoa(addr.sin_addr)) << std::endl;
-    }
-    else
-    {
-        close(clientSocket);
-        return;
-    }
+    // struct sockaddr_in addr;
+    // socklen_t addrLen = sizeof(addr);
+    // if (getpeername(clientSocket, (struct sockaddr*)&addr, &addrLen) == 0)
+    // {
+    //     std::cout << std::string(inet_ntoa(addr.sin_addr)) << std::endl;
+    // }
+    // else
+    // {
+    //     close(clientSocket);
+    //     return;
+    // }
 
     char peekBuf[4];
     int r = recv(clientSocket, peekBuf, sizeof(peekBuf), MSG_PEEK);
