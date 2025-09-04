@@ -1,6 +1,6 @@
 # C++ Http Server
 
-## About This Project
+## :globe_with_meridians: About This Project
 
 I started this project to better understand how HTTP works at a low level.
 My initial goal was simple — to build a server that could send an HTML page to a client.
@@ -21,7 +21,7 @@ Coding this project, I learned:
 
 - How to integrate security features into a custom server
 
-## Requirements
+## :clipboard: Requirements
 
 - Cmake
 - Ninja
@@ -30,7 +30,7 @@ Coding this project, I learned:
 
 Or just run with docker :smiley:
 
-## Setup & Run
+## :floppy_disk: Setup & Run
 
 ### Docker
 
