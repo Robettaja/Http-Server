@@ -1,8 +1,25 @@
 # C++ Http Server
 
-## Purpose
+## About This Project
 
-...
+I started this project to better understand how HTTP works at a low level.
+My initial goal was simple — to build a server that could send an HTML page to a client.
+
+As I progressed, I expanded the project to include:
+
+- HTTPS support – learning how to implement secure communication
+
+- Security features – for example, path sanitization to prevent path traversal attacks
+
+Coding this project, I learned:
+
+- Socket programming in C++
+
+- How HTTP/1.0 and HTTP/1.1 work
+
+- The basics of HTTPS and TLS
+
+- How to integrate security features into a custom server
 
 ## Requirements
 
@@ -13,9 +30,9 @@
 
 Or just run with docker :smiley:
 
-## How to run
+## Setup & Run
 
-### With docker
+### Docker
 
 ```sh
 docker build . -t <name>
@@ -25,7 +42,7 @@ docker build . -t <name>
 docker run -p 8443:8443 <your image name>
 ```
 
-### With cmake
+### Cmake
 
 Create `CMakeUserPresets.json` and adjust vcpkg path.
 
