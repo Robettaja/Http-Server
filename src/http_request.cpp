@@ -63,7 +63,7 @@ std::string HttpRequest::sanitizePath(const std::string& path)
     }
     if (sanitized[0] == '/')
         sanitized.erase(0, 1);
-    return sanitized;
+    return "www/" + sanitized;
 }
 
 } // namespace RobeHttpServer

@@ -9,4 +9,4 @@
 
 - reverse proxy
 - make it work with react
-- before quiting dockerize server
+- [x] before quiting dockerize server
